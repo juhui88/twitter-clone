@@ -11,6 +11,7 @@ async function handler(
     const existingUser = await db.user.findUnique({
         where:{email},
     })
+
     if (existingUser) {
         res.json({
             ok:false,
@@ -28,7 +29,7 @@ async function handler(
             exist:"userId"
         })
     }
-
+    
     const user = await db.user.create({
         data : {
             email,

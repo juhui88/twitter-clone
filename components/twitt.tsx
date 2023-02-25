@@ -1,26 +1,47 @@
+import { useRouter } from "next/router"
+import { useEffect } from "react";
+import useSWR from "swr"
+import useMutation from "../lib/useMutation"
 
-export default function Twitt() {
+interface TwittForm {
+    id: number;
+    content:String;
+}
+interface MutationResult {
+  ok: boolean;
+}
+
+interface ItemDetailResponse {
+    ok: boolean;
+    isLiked: boolean;
+}
+export default function Twitt({
+    id, content // user의 id값
+} : TwittForm) {
+    const router = useRouter();
+    const {data} = useSWR(`http://localhost:3000/api/users/${id}`)
+    const [toggleFav] = useMutation(`http://localhost:3000/api/twitts/${router.query.id}/fav`);
+    const {data:favData, mutate} = useSWR<ItemDetailResponse>(`http://localhost:3000/api/twitts/${router.query.id}`)
+    const onFavClick = ()=>{
+        mutate((prev) => prev && { ...prev, isLiked: !prev.isLiked }, false);
+        toggleFav({})
+    }
+    
     return (
-    <div className="flex p-4 space-x-3  w-full border-b-[1px]">
+    <div className="flex p-4 space-x-3  w-[530px] border-b-[1px]">
         <div>
             <div className="rounded-full w-11 h-11 bg-slate-500"/>
         </div>
         <div className="flex-1">
             <div className="flex">
-                <span className="font-bold mr-1">쓴 사람</span>
+                <span className="font-bold mr-1">{data?.userInfo?.userName}</span>
                 <div className="space-x-1">
-                    <span className="text-slate-500">@아이디</span>
-                    <span className="text-slate-500">·</span>
-                    <span className="text-slate-500">9시간</span>            
+                    <span className="text-slate-500 text-sm">@{data?.userInfo?.userId}</span>        
                 </div>
                 
             </div>
             <div className="">
-                <span>빨간머리 (?)🥕🥕✨✨<br/>
-                    추억은 방울방울 💚<br/>
-                    버니즈~ 오늘 하루도 화이팅 하세요!🌱
-                </span><br/>
-                <span className="text-cyan-500">#뉴진스 #혜인 #NEWJEANS</span>
+                <span>{content}</span>
             </div>
             <div className="grid grid-cols-2 gap-1 h-56 my-3">
                 <div className="bg-slate-300 rounded-tl-2xl"/>
@@ -41,10 +62,18 @@ export default function Twitt() {
                     </svg>
                     <span>리트윗수</span>    
                 </span>
-                <span className="flex space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
+                <span className="flex space-x-2">{
+                    favData?.isLiked ? 
+                    <svg onClick={onFavClick} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-red-500">
+                    <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                    </svg>
+
+                    :
+                    <svg onClick={onFavClick}  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 hover:text-red-500">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                     </svg>
+                }
+                    
                     <span>하트수</span>
                 </span>
                 <span className="flex space-x-2">

@@ -2,5 +2,10 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/api/users/create-account": "pages/api/users/create-account.js"
+  "/api/users/[id]": "pages/api/users/[id].js",
+  "/api/twitts/[id]": "pages/api/twitts/[id].js",
+  "/": "pages/index.js",
+  "/api/users/me": "pages/api/users/me.js",
+  "/api/twitts": "pages/api/twitts.js",
+  "/api/twitts/[id]/fav": "pages/api/twitts/[id]/fav.js"
 }

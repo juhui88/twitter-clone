@@ -18,29 +18,31 @@ model User {
   userId    String   @unique
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
-  tokens    Token[]
-  tweets    Tweet[]
+  twitts    Twitt[]
+  favs      Fav[]
 }
 
-model Token {
+model Twitt {
   id        Int      @id @default(autoincrement())
-  payload   String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // 유저 사라지면 토큰 정보도 같이 사라짐
-  userId    Int
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  content   String
+  favs      Fav[]
 
   @@index([userId])
 }
 
-model Tweet {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
-  image       String
-  description String
+model Fav {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  twitt     Twitt    @relation(fields: [twittId], references: [id], onDelete: Cascade)
+  twittId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([twittId])
 }

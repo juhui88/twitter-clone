@@ -1,15 +1,34 @@
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form"
+import useMutation from "../lib/useMutation";
 
 interface dataForm {
     email:String,
     password: String
 }
 
+interface MutationResult {
+  ok: boolean;
+}
+
 export default function Login(){
+    const router = useRouter();
     const {register, handleSubmit, setError} = useForm();
+    const [login, {loading, data}] = useMutation<MutationResult>("api/users/login");
     const onValid = (data:dataForm) => {
+        login(data)
 
     }
+    useEffect(()=>{
+        if(data?.ok) {
+            alert("로그인 성공!")
+            router.push("/")
+            
+        }else if(data?.ok === false) {
+            alert("로그인 실패! 이메일과 비밀번호를 다시 확인해주세요")
+        }
+    },[data, router])
     return(
     <div className="flex flex-col w-screen h-screen  items-center">
         <div className="flex py-20 space-x-5"><svg viewBox="328 355 335 276" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8">
